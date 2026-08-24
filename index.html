@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DermaScan | Skin Condition Detector</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(255, 210, 220, 0.45), transparent 30%),
+                radial-gradient(circle at 90% 10%, rgba(200, 235, 225, 0.5), transparent 30%),
+                linear-gradient(135deg, #fff9f7 0%, #f4fbf8 100%);
+            color: #263238;
+        }
+
+        /* NAVBAR */
+
+        nav {
+            height: 75px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 7%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255,255,255,0.7);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #263b35;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #d8f1e7, #f8dce5);
+            font-size: 22px;
+        }
+
+        .nav-tag {
+            padding: 8px 15px;
+            background: #ffffff;
+            border-radius: 30px;
+            font-size: 13px;
+            color: #65756f;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            padding: 65px 20px 35px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(216, 241, 231, 0.8);
+            color: #3c7661;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: clamp(38px, 6vw, 62px);
+            line-height: 1.08;
+            letter-spacing: -2px;
+            color: #25352f;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(90deg, #4d9279, #c17c91);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            max-width: 650px;
+            margin: auto;
+            color: #71807b;
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        /* MAIN CARD */
+
+        .container {
+            max-width: 850px;
+            margin: 20px auto 70px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow:
+                0 25px 70px rgba(61, 82, 75, 0.12),
+                inset 0 1px 0 rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.9);
+        }
+
+        .card-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .card-title h2 {
+            font-size: 24px;
+            color: #2d3d37;
+            margin-bottom: 7px;
+        }
+
+        .card-title p {
+            color: #87938f;
+            font-size: 14px;
+        }
+
+        /* UPLOAD AREA */
+
+        .upload-box {
+            border: 2px dashed #cbded6;
+            border-radius: 22px;
+            padding: 45px 20px;
+            text-align: center;
+            background: linear-gradient(
+                145deg,
+                rgba(247,252,250,0.9),
+                rgba(255,248,250,0.8)
+            );
+            transition: 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-box:hover {
+            border-color: #77aa98;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(68, 115, 98, 0.08);
+        }
+
+        .upload-icon {
+            width: 75px;
+            height: 75px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dff3ea, #f8e1e7);
+            font-size: 34px;
+            margin-bottom: 18px;
+        }
+
+        .upload-box h3 {
+            font-size: 18px;
+            color: #374740;
+            margin-bottom: 8px;
+        }
+
+        .upload-box p {
+            color: #8b9692;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .choose-btn {
+            display: inline-block;
+            padding: 11px 22px;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #d6e3de;
+            color: #4c7566;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .choose-btn:hover {
+            background: #f1f8f5;
+        }
+
+        #fileName {
+            margin-top: 15px;
+            color: #5f776e;
+            font-size: 13px;
+        }
+
+        /* IMAGE PREVIEW */
+
+        #previewContainer {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #preview {
+            max-width: 240px;
+            max-height: 240px;
+            border-radius: 18px;
+            object-fit: cover;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+        }
+
+        /* ANALYZE BUTTON */
+
+        .analyze-btn {
+            width: 100%;
+            margin-top: 22px;
+            padding: 16px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #4d9279, #6eae98);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 25px rgba(77, 146, 121, 0.22);
+            transition: 0.25s ease;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 17px 30px rgba(77, 146, 121, 0.28);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* LOADING */
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 25px;
+            color: #637a70;
+        }
+
+        .spinner {
+            width: 35px;
+            height: 35px;
+            border: 4px solid #dcebe5;
+            border-top-color: #4d9279;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* RESULTS */
+
+        .result {
+            display: none;
+            margin-top: 30px;
+            padding: 28px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #f1faf6, #fff5f7);
+            border: 1px solid #dcece6;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .detected-label {
+            font-size: 13px;
+            color: #75847e;
+            margin-bottom: 5px;
+        }
+
+        .condition {
+            font-size: 30px;
+            font-weight: 700;
+            color: #31453d;
+            text-transform: capitalize;
+        }
+
+        .confidence {
+            min-width: 100px;
+            padding: 13px;
+            border-radius: 15px;
+            text-align: center;
+            background: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+
+        .confidence strong {
+            display: block;
+            font-size: 21px;
+            color: #4d9279;
+        }
+
+        .confidence span {
+            font-size: 11px;
+            color: #87938f;
+        }
+
+        .recommend-title {
+            font-size: 16px;
+            color: #46564f;
+            margin-bottom: 12px;
+        }
+
+        .recommendations {
+            list-style: none;
+            display: grid;
+            gap: 10px;
+        }
+
+        .recommendations li {
+            background: rgba(255,255,255,0.85);
+            padding: 13px 15px;
+            border-radius: 12px;
+            color: #52635b;
+            font-size: 14px;
+            border: 1px solid #edf1ef;
+        }
+
+        .recommendations li::before {
+            content: "✓";
+            color: #4d9279;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #8a9691;
+            font-size: 12px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 600px) {
+
+            nav {
+                padding: 0 20px;
+            }
+
+            .nav-tag {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 45px;
+            }
+
+            .hero h1 {
+                font-size: 40px;
+            }
+
+            .card {
+                padding: 22px;
+                border-radius: 22px;
+            }
+
+            .upload-box {
+                padding: 35px 15px;
+            }
+
+            .result-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .confidence {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">🧴</div>
+            <span>DermaScan</span>
+        </div>
+
+        <div class="nav-tag">
+             Skin Analysis
+        </div>
+    </nav>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="badge">
+            ✨ Intelligent Skin Analysis
+        </div>
+
+        <h1>
+            Understand Your Skin.<br>
+            <span>Care For It Better.</span>
+        </h1>
+
+        <p>
+            Upload a clear facial image and let our 
+            skin detection system identify your skin condition
+            and provide personalized product recommendations.
+        </p>
+
+    </section>
+
+
+    <!-- MAIN -->
+
+    <main class="container">
+
+        <div class="card">
+
+            <div class="card-title">
+                <h2>🔍 Analyze Your Skin</h2>
+                <p>Upload a clear photo of your face for analysis</p>
+            </div>
+
+
+            <!-- UPLOAD -->
+
+            <div class="upload-box"
+                 onclick="document.getElementById('imageInput').click()">
+
+                <div class="upload-icon">
+                    📸
+                </div>
+
+                <h3>Upload Your Facial Image</h3>
+
+                <p>
+                    JPG, JPEG or PNG • Clear and well-lit images work best
+                </p>
+
+                <label class="choose-btn"
+                       onclick="event.stopPropagation()">
+
+                    Choose Image
+
+                    <input
+                        type="file"
+                        id="imageInput"
+                        accept="image/*"
+                        onchange="previewImage()">
+                </label>
+
+                <div id="fileName"></div>
+
+            </div>
+
+
+            <!-- PREVIEW -->
+
+            <div id="previewContainer">
+
+                <img id="preview" alt="Image Preview">
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                class="analyze-btn"
+                id="analyzeButton"
+                onclick="analyzeImage()">
+
+                ✨ Analyze My Skin
+
+            </button>
+
+
+            <!-- LOADING -->
+
+            <div id="loading" class="loading">
+
+                <div class="spinner"></div>
+
+                <p>Analyzing your skin...</p>
+                <small>This may take a few seconds</small>
+
+            </div>
+
+
+            <!-- RESULTS -->
+
+            <div id="results" class="result"></div>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        DermaScan • AI-Powered Skin Condition Detection
+    </footer>
+
+
+    <script>
+
+        // IMAGE PREVIEW
+
+        function previewImage() {
+
+            const input =
+                document.getElementById("imageInput");
+
+            const file = input.files[0];
+
+            if (!file) return;
+
+            document.getElementById("fileName").textContent =
+                "Selected: " + file.name;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                document.getElementById("preview").src =
+                    e.target.result;
+
+                document.getElementById("previewContainer")
+                    .style.display = "block";
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+
+        // ANALYZE IMAGE
+
+        async function analyzeImage() {
+
+            const file =
+                document.getElementById("imageInput").files[0];
+
+            if (!file) {
+
+                alert("Please select an image first!");
+
+                return;
+            }
+
+
+            const loading =
+                document.getElementById("loading");
+
+            const results =
+                document.getElementById("results");
+
+            const button =
+                document.getElementById("analyzeButton");
+
+
+            loading.style.display = "block";
+
+            results.style.display = "none";
+
+            button.disabled = true;
+
+            button.innerHTML = "⏳ Analyzing...";
+
+
+            const formData = new FormData();
+
+            formData.append("image", file);
+
+
+            try {
+
+                const response =
+                    await fetch("/analyze", {
+
+                        method: "POST",
+
+                        body: formData
+
+                    });
+
+
+                const data =
+                    await response.json();
+
+
+                loading.style.display = "none";
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    "✨ Analyze Again";
+
+
+                if (data.error) {
+
+                    results.innerHTML = `
+                        <p style="color:#d9534f; font-weight:600;">
+                            ⚠️ ${data.error}
+                        </p>
+                    `;
+
+                } else {
+
+                    let html = `
+
+                        <div class="result-header">
+
+                            <div>
+
+                                <div class="detected-label">
+                                    Detected Skin Condition
+                                </div>
+
+                                <div class="condition">
+                                    ${data.condition}
+                                </div>
+
+                            </div>
+
+                            <div class="confidence">
+
+                                <strong>
+                                    ${data.confidence}%
+                                </strong>
+
+                                <span>
+                                    Confidence
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="recommend-title">
+                            🧴 Recommended Products
+                        </div>
+
+                        <ul class="recommendations">
+                    `;
+
+
+                    data.recommendations.forEach(product => {
+
+                        html += `
+                            <li>${product}</li>
+                        `;
+
+                    });
+
+
+                    html += `
+                        </ul>
+                    `;
+
+
+                    results.innerHTML = html;
+                }
+
+
+                results.style.display = "block";
+
+                results.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest"
+                });
+
+            }
+
+            catch (err) {
+
+                loading.style.display = "none";
+
+                button.disabled = false;
+
+                button.innerHTML =
+                    "✨ Analyze My Skin";
+
+
+                results.innerHTML = `
+                    <p style="color:#d9534f;">
+                        ⚠️ Error: ${err.message}
+                    </p>
+                `;
+
+                results.style.display = "block";
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>
